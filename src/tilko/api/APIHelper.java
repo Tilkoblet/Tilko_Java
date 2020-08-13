@@ -35,11 +35,11 @@ public class APIHelper {
 	static final Logger _logger = LoggerFactory.getLogger(APIHelper.class);
 
 	//	Tilko.net에서 발급된 공용키
-	private static String  _pubUrl = "http://beta.api.tilko.net/api/Auth/GetPublicKey?APIkey=";
+	private static String  _pubUrl = "https://api.tilko.net/api/Auth/GetPublicKey?ApiKey=";
 	//	API Address : 건강보험공단(건강보험료납부내역)
-	private static String _paymentUrl = "http://beta.api.tilko.net/api/v1.0/Nhis/PaymentList";
+	private static String _paymentUrl = "https://api.tilko.net/api/v1.0/nhis/jpaca00101/geongangboheom";
 	//	API Address : 내가 먹는 약
-	private static String _myDrugUrl = "http://beta.api.tilko.net/api/v1.0/Hira/MyDrugList";
+	private static String _myDrugUrl = "https://api.tilko.net/api/v1.0/hira/hiraa050300000100";
 	//	Tilko.net의 API 와 통신간 파라미터에 담긴 사용자의 개인정보를 암호화하기 위한 AES 알고리즘
 	private AES _aes;
 	//	Tilko.net 에 서 발급된 개인 apiKey

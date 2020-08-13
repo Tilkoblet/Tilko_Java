@@ -67,8 +67,8 @@ public class UI {
 
 	// 각 데이터의 EndPoint를 정의합니다.
 	public void initUIData() {
-		this._cmbEndPoint.addItem(new ComboItem("건강보험공단(건강보험료납부내역)", "http://beta.api.tilko.net/api/v1.0/Nhis/PaymentList"));
-		this._cmbEndPoint.addItem(new ComboItem("내가 먹는 약", "http://beta.api.tilko.net/api/v1.0/Hira/MyDrugList"));
+		this._cmbEndPoint.addItem(new ComboItem("건강보험공단(건강보험료납부내역)", "https://api.tilko.net/api/v1.0/nhis/jpaca00101/geongangboheom"));
+		this._cmbEndPoint.addItem(new ComboItem("내가 먹는 약", "https://api.tilko.net/api/v1.0/hira/hiraa050300000100"));
 
 	}
 

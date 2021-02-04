@@ -320,8 +320,7 @@ public class UI {
 
 					_btnOK.setEnabled(false);
 					_btnCancel.setEnabled(false);
-
-
+					
 					String _certFilePath = _txtCertPath.getText() + File.separator + "signCert.der";
 					String _keyFilePath = _txtCertPath.getText() + File.separator + "signPri.key";
 					logger.info("certFilePath : {}", _certFilePath);

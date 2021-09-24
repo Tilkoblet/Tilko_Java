@@ -36,6 +36,8 @@ public class APIHelper {
 
 	//	Tilko.net에서 발급된 공용키
 	private static String  _pubUrl = "https://api.tilko.net/api/Auth/GetPublicKey?ApiKey=";
+	//	API Address : 건강보험공단(직장보험료 조회)
+	private static String _companyInsuranceUrl = "https://api.tilko.net/api/v1.0/nhis/jpzaa00110";
 	//	API Address : 건강보험공단(건강보험료납부내역)
 	private static String _paymentUrl = "https://api.tilko.net/api/v1.0/nhis/jpaca00101/geongangboheom";
 	//	API Address : 내가 먹는 약
@@ -101,21 +103,18 @@ public class APIHelper {
 	}
 
 	/**
-	  * @Method Name : getPaymentList
-	  * @작성일 : 2020. 8. 13.
-	  * @작성자 : Tilko.net
-	  * @변경이력 :
-	  * @Method 설명 : 건강보험료납부내역 API 호출
-	  * @param aesCipherKey : ENC-Key
-	  * @param certFilePath : 인증서 공용키
-	  * @param keyFilePath : 인증서 개인키
-	  * @param txtIdentityNumber : 주민등록번호(202008131234567)
-	  * @param txtCertPassword : 인증서 암호
-	  * @param year : 검색년도(yyyy)
-	  * @param startMonth : 검색 시작 월(MM)
-	  * @param endMonth : 검색 종료 월(MM)
-	  * @return : 결과
-	  * @throws IOException
+	 * @Method Name : getCompanyInsurance
+	 * @작성일 : 2021. 9. 24.
+	 * @작성자 : Tilko.net
+	 * @변경이력 :
+	 * @Method 설명 : 직장보험료 조회 API 호출
+	 * @param aesCipherKey : ENC-Key
+	 * @param certFilePath : 인증서 공용키
+	 * @param keyFilePath : 인증서 개인키
+	 * @param txtCertPassword : 인증서 암호
+	 * @param year : 검색년도(yyyy)
+	 * @return : 결과
+	 * @throws IOException
 	 * @throws BadPaddingException
 	 * @throws IllegalBlockSizeException
 	 * @throws InvalidAlgorithmParameterException
@@ -123,27 +122,23 @@ public class APIHelper {
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
 	  */
-	public String getPaymentList(byte[] aesCipherKey, String certFilePath, String keyFilePath, String txtIdentityNumber, String txtCertPassword, String year, String startMonth, String endMonth) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public String getCompanyInsurance(byte[] aesCipherKey, String certFilePath, String keyFilePath, String txtCertPassword, String year) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 
 		_logger.info(certFilePath);
 		_logger.info(keyFilePath);
-		_logger.info(txtIdentityNumber);
 		_logger.info(txtCertPassword);
+		_logger.info(year);
 
 		byte[] _certCipherBytes				= this._aes.Encrypt(Util.FileToByteArray(certFilePath));
 		byte[] _keyCipherBytes				= this._aes.Encrypt(Util.FileToByteArray(keyFilePath));
-		byte[] _identityCipherBytes			= this._aes.Encrypt(txtIdentityNumber.replace("-", "").getBytes("US-ASCII"));
 		byte[] _passwordCipherBytes			= this._aes.Encrypt(txtCertPassword.getBytes("US-ASCII"));
 
 		//	파라미터 셋팅
 		HashMap<String, String> _bodyMap	= new HashMap<String, String>();
 		_bodyMap.put("CertFile", Util.base64Encode(_certCipherBytes));
 		_bodyMap.put("KeyFile", Util.base64Encode(_keyCipherBytes));
-		_bodyMap.put("IdentityNumber", Util.base64Encode(_identityCipherBytes));
 		_bodyMap.put("CertPassword", Util.base64Encode(_passwordCipherBytes));
 		_bodyMap.put("Year", year);
-		_bodyMap.put("StartMonth", startMonth);
-		_bodyMap.put("EndMonth", endMonth);
 
 		RequestBody _body					= RequestBody.create
 												(
@@ -153,7 +148,7 @@ public class APIHelper {
 
 		OkHttpClient _client				= new OkHttpClient().newBuilder().build();
 		Request _request					= new Request.Builder()
-															.url(APIHelper._paymentUrl)
+															.url(APIHelper._companyInsuranceUrl)
 															.post(_body)
 															.addHeader("Content-Type", "application/json")
 															.addHeader("API-Key", this._apiKey)
@@ -163,11 +158,83 @@ public class APIHelper {
 		Response _response					= _client.newCall(_request).execute();
 		String _responseStr					= _response.body().string();
 
-		_logger.info("========= PaymentList REQUEST =========");
+		_logger.info("========= CompanyInsurance REQUEST =========");
 		_logger.info("Response : " + _responseStr);
 		_logger.info("API-Key: " +  this._apiKey);
 		_logger.info("ENC-Key: {}", Util.base64Encode(aesCipherKey));
 
+		return _responseStr;
+	}
+	
+	
+	/**
+	 * @Method Name : getPaymentList
+	 * @작성일 : 2020. 8. 13.
+	 * @작성자 : Tilko.net
+	 * @변경이력 :
+	 * @Method 설명 : 건강보험료납부내역 API 호출
+	 * @param aesCipherKey : ENC-Key
+	 * @param certFilePath : 인증서 공용키
+	 * @param keyFilePath : 인증서 개인키
+	 * @param txtIdentityNumber : 주민등록번호(202008131234567)
+	 * @param txtCertPassword : 인증서 암호
+	 * @param year : 검색년도(yyyy)
+	 * @param startMonth : 검색 시작 월(MM)
+	 * @param endMonth : 검색 종료 월(MM)
+	 * @return : 결과
+	 * @throws IOException
+	 * @throws BadPaddingException
+	 * @throws IllegalBlockSizeException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws NoSuchPaddingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeyException
+	 */
+	public String getPaymentList(byte[] aesCipherKey, String certFilePath, String keyFilePath, String txtIdentityNumber, String txtCertPassword, String year, String startMonth, String endMonth) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+		
+		_logger.info(certFilePath);
+		_logger.info(keyFilePath);
+		_logger.info(txtIdentityNumber);
+		_logger.info(txtCertPassword);
+		
+		byte[] _certCipherBytes				= this._aes.Encrypt(Util.FileToByteArray(certFilePath));
+		byte[] _keyCipherBytes				= this._aes.Encrypt(Util.FileToByteArray(keyFilePath));
+		byte[] _identityCipherBytes			= this._aes.Encrypt(txtIdentityNumber.replace("-", "").getBytes("US-ASCII"));
+		byte[] _passwordCipherBytes			= this._aes.Encrypt(txtCertPassword.getBytes("US-ASCII"));
+		
+		//	파라미터 셋팅
+		HashMap<String, String> _bodyMap	= new HashMap<String, String>();
+		_bodyMap.put("CertFile", Util.base64Encode(_certCipherBytes));
+		_bodyMap.put("KeyFile", Util.base64Encode(_keyCipherBytes));
+		_bodyMap.put("IdentityNumber", Util.base64Encode(_identityCipherBytes));
+		_bodyMap.put("CertPassword", Util.base64Encode(_passwordCipherBytes));
+		_bodyMap.put("Year", year);
+		_bodyMap.put("StartMonth", startMonth);
+		_bodyMap.put("EndMonth", endMonth);
+		
+		RequestBody _body					= RequestBody.create
+				(
+						MediaType.parse("application/json; charset=utf-8"),
+						new Gson().toJson(_bodyMap)
+						);
+		
+		OkHttpClient _client				= new OkHttpClient().newBuilder().build();
+		Request _request					= new Request.Builder()
+				.url(APIHelper._paymentUrl)
+				.post(_body)
+				.addHeader("Content-Type", "application/json")
+				.addHeader("API-Key", this._apiKey)
+				.addHeader("ENC-Key", Util.base64Encode(aesCipherKey))
+				.build();
+		
+		Response _response					= _client.newCall(_request).execute();
+		String _responseStr					= _response.body().string();
+		
+		_logger.info("========= PaymentList REQUEST =========");
+		_logger.info("Response : " + _responseStr);
+		_logger.info("API-Key: " +  this._apiKey);
+		_logger.info("ENC-Key: {}", Util.base64Encode(aesCipherKey));
+		
 		return _responseStr;
 	}
 

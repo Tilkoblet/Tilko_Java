@@ -38,6 +38,36 @@ public class UnitTest extends TestCase {
 	private static String _certPath = "C:\\Users\\PC이름\\AppData\\LocalLow\\NPKI\\yessign\\USER\\인증서폴더";
 
 	/**
+	 * @Method Name : CompanyInsuranceTest
+	 * @작성일 : 2021. 9. 24.
+	 * @작성자 : Tilko.net
+	 * @변경이력 :
+	 * @Method 설명 : 직장보험료 조회 테스트 메소드
+	 * @throws Exception
+	 */
+	@Test
+	public void CompanyInsuranceTest() throws Exception {
+
+		APIHelper _apiHelper = new APIHelper(UnitTest._apiKey);
+		RsaPublicKey _pubKey = _apiHelper.getRSAPubKey();
+
+		// RSA공개로 AES키 암호화
+		byte[] _aesCipherKey = Util.encodeByRSAPublicKey(_apiHelper.getAESPlainKey(), _pubKey.getPublicKey());
+
+		// 건강보험료 납부 내역 조회
+		String _txtCertPassword = "인증서비밀번호"; // 인증서 비밀번호
+		String _yyyy = "2021";
+
+		String _result = _apiHelper.getCompanyInsurance(_aesCipherKey, UnitTest._certPath + File.separator + "signCert.der",
+				UnitTest._certPath + File.separator + "signPri.key", _txtCertPassword, _yyyy);
+
+		// 결과
+		System.out.println("CompanyInsuranceTest - result:" + _result);
+
+		assertEquals(_result.length() > 0, true);
+	}
+	
+	/**
 	 * @Method Name : PaymentListTest
 	 * @작성일 : 2020. 8. 13.
 	 * @작성자 : Tilko.net
@@ -47,27 +77,27 @@ public class UnitTest extends TestCase {
 	 */
 	@Test
 	public void PaymentListTest() throws Exception {
-
+		
 		APIHelper _apiHelper = new APIHelper(UnitTest._apiKey);
 		RsaPublicKey _pubKey = _apiHelper.getRSAPubKey();
-
+		
 		// RSA공개로 AES키 암호화
 		byte[] _aesCipherKey = Util.encodeByRSAPublicKey(_apiHelper.getAESPlainKey(), _pubKey.getPublicKey());
-
+		
 		// 건강보험료 납부 내역 조회
 		String _txtIdentityNumber = "주민등록번호"; // 주민등록번호
 		String _txtCertPassword = "인증서비밀번호"; // 인증서 비밀번호
 		String _yyyy = "2019";
 		String _sMM = "01";
 		String _eMM = "12";
-
+		
 		String _result = _apiHelper.getPaymentList(_aesCipherKey, UnitTest._certPath + File.separator + "signCert.der",
 				UnitTest._certPath + File.separator + "signPri.key", _txtIdentityNumber, _txtCertPassword, _yyyy, _sMM,
 				_eMM);
-
+		
 		// 결과
 		System.out.println("PaymentListTest - result:" + _result);
-
+		
 		assertEquals(_result.length() > 0, true);
 	}
 
